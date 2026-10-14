@@ -1,106 +1,143 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Fetch real data from your backend
-        const statsResponse = await fetch(`${BASE_URL}/grievances/stats`);
-        const stats = await statsResponse.json();
-
-        // 1. Render Department Load Chart (Doughnut)
-        const deptLabels = stats.deptCounts.map(d => d._id);
-        const deptData = stats.deptCounts.map(d => d.count);
-
-        const catCtx = document.getElementById('categoryChart').getContext('2d');
-        new Chart(catCtx, {
-            type: 'doughnut',
-            data: {
-                labels: deptLabels,
-                datasets: [{
-                    data: deptData,
-                    backgroundColor: [
-                        '#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
-                        '#8b5cf6', '#ec4899', '#14b8a6', '#64748b'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false } // Hidden for cleaner presentation look
-                }
-            }
-        });
-
-        // 2. Render Resolution Trend (Line Chart - Mocked for presentation impact)
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Avg Resolution Time (Days)',
-                    data: [14.5, 12.0, 10.2, 8.5], // Downward trend looks great for a pitch
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4 // Smooth curves
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error("Error loading charts:", error);
+    // 1. Authenticate Officer
+    const token = localStorage.getItem("pcmc_token");
+    if (!token) {
+        alert("Session expired. Please log in.");
+        window.location.href = "login.html";
+        return;
     }
 
-    // 3. CSV Export Logic
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-    if (exportCsvBtn) {
-        exportCsvBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch(`${BASE_URL}/grievances/all`);
-                const grievances = await response.json();
+    let allGrievances = [];
 
-                if (grievances.length === 0) {
-                    alert("No data available to export.");
-                    return;
+    // Helper: Convert array of objects to CSV string
+    const convertToCSV = (data) => {
+        const headers = ["Ticket ID", "Date Submitted", "Department", "Urgency", "Status", "Location", "Description"];
+        const rows = data.map(ticket => {
+            const formattedId = "PCMC-" + ticket._id.substring(0, 8).toUpperCase();
+            const dateStr = new Date(ticket.createdAt).toLocaleDateString('en-IN');
+            
+            // Escape quotes to handle commas inside text fields safely
+            const cleanLocation = (ticket.location || "Not Provided").replace(/"/g, '""');
+            const cleanDesc = (ticket.rawText || "").replace(/"/g, '""');
+            
+            return [
+                formattedId,
+                dateStr,
+                ticket.department || "Unassigned",
+                ticket.urgency || "Normal",
+                ticket.status || "New",
+                `"${cleanLocation}"`,
+                `"${cleanDesc}"`
+            ].join(",");
+        });
+        
+        return [headers.join(","), ...rows].join("\n");
+    };
+
+    try {
+        // 2. Fetch Stats and Grievances
+        let [statsRes, grievancesRes] = await Promise.all([
+            fetch('https://pcmc-admin.onrender.com/api/stats', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/stats')),
+            fetch('https://pcmc-admin.onrender.com/api/grievances', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/grievances', { headers: { 'Authorization': `Bearer ${token}` } }))
+        ]);
+
+        if (!statsRes.ok || !grievancesRes.ok) throw new Error("Failed to load data");
+
+        const stats = await statsRes.json();
+        allGrievances = await grievancesRes.json();
+
+        // 3. Render Live Departmental Load (Doughnut Chart)
+        if (stats.deptCounts && document.getElementById('categoryChart')) {
+            const sortedDepts = stats.deptCounts.sort((a, b) => b.count - a.count);
+            const deptLabels = sortedDepts.map(d => d._id || 'Unassigned');
+            const deptData = sortedDepts.map(d => d.count);
+
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: deptLabels,
+                    datasets: [{
+                        data: deptData,
+                        backgroundColor: ['#1e40af', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#f87171', '#fbbf24', '#34d399', '#94a3b8'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } }
                 }
+            });
+        }
 
-                // Create CSV Headers
-                let csvContent = "Ticket ID,Date,Department,Urgency,Status,Location\n";
+        // 4. Render Submission Trend (Line Chart)
+        if (document.getElementById('trendChart') && allGrievances.length > 0) {
+            const last7Days = [...Array(7)].map((_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+            }).reverse();
 
-                // Loop through data and build CSV rows
-                grievances.forEach(g => {
-                    const date = new Date(g.createdAt).toLocaleDateString('en-IN');
-                    // Escape commas in location string
-                    const location = `"${g.location || 'Unknown'}"`; 
-                    csvContent += `${g._id},${date},${g.department},${g.urgency},${g.status},${location}\n`;
-                });
+            const trendCounts = new Array(7).fill(0);
+            
+            allGrievances.forEach(ticket => {
+                const ticketDate = new Date(ticket.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+                const index = last7Days.indexOf(ticketDate);
+                if (index !== -1) {
+                    trendCounts[index]++;
+                }
+            });
 
-                // Trigger file download
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", "PCMC_Grievance_Report.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Grievances Submitted',
+                        data: trendCounts,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, suggestedMax: 10 } }
+                }
+            });
+        }
 
-            } catch (error) {
-                console.error("Export failed:", error);
-                alert("Failed to export data.");
+    } catch (error) {
+        console.error("Dashboard Load Error:", error);
+    }
+
+    // 5. Handle CSV Export
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener("click", () => {
+            if (allGrievances.length === 0) {
+                alert("No data available to export.");
+                return;
             }
+
+            const csvString = convertToCSV(allGrievances);
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `PCMC_Official_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     }
 });

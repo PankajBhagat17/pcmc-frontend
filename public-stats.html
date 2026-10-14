@@ -3,118 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Stats - PCMC Portal</title>
+    <title>Public Transparency Stats - PCMC</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Import Chart.js for data visualization -->
+    <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
-
-    <!-- Navbar -->
-    <header class="w-full border-b border-gray-100 bg-white sticky top-0 z-50 shadow-sm">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+    <!-- Citizen Navbar -->
+    <header class="w-full border-b border-gray-100 bg-white sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <a href="index.html" class="flex items-center gap-2">
-                    <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                    <span class="font-bold text-lg text-blue-950 tracking-tight">PCMC Grievance Portal</span>
+                <a href="landing.html" class="flex items-center gap-2">
+                    <span class="font-bold text-lg text-blue-950">PCMC Grievance Portal</span>
                 </a>
-                
-                <!-- Center Links -->
                 <nav class="hidden md:flex gap-8">
-                    <a href="index.html" class="text-sm font-medium text-gray-500 hover:text-blue-950 transition-colors">Home</a>
-                    <a href="track-status.html" class="text-sm font-medium text-gray-500 hover:text-blue-950 transition-colors">Track</a>
-                    <a href="#" class="text-sm font-semibold text-blue-950 border-b-2 border-blue-950 pb-1">Public Stats</a>
+                    <a href="landing.html" class="text-sm font-medium text-gray-500 hover:text-blue-950">Home</a>
+                    <a href="track-status.html" class="text-sm font-medium text-gray-500 hover:text-blue-950">Track</a>
+                    <a href="public-stats.html" class="text-sm font-semibold text-blue-950 border-b-2 border-blue-950 pb-1">Public Stats</a>
                 </nav>
-
-                <!-- Right Actions -->
                 <div class="flex items-center gap-4">
-                    <!-- CHANGED: href is now login.html instead of admin.html -->
-                    <a href="login.html" class="text-sm font-medium text-blue-900 bg-blue-50 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors border border-blue-100">Officer Login</a>
+                    <a href="login.html" class="text-sm font-medium text-blue-900 bg-blue-50 px-4 py-2 rounded-md hover:bg-blue-100 border border-blue-100">Sign Up/Login</a>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-10 fade-in">
-        
-        <!-- Header -->
-        <div class="mb-10">
-            <h1 class="text-3xl font-bold text-blue-950 mb-2">Transparency Dashboard</h1>
-            <p class="text-gray-500 text-lg">Real-time insights into municipal performance and AI-driven grievance resolution.</p>
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950 mb-4">Transparency Dashboard</h1>
+            <p class="text-gray-500 text-lg">Real-time civic resolution metrics for Pimpri-Chinchwad.</p>
         </div>
 
-        <!-- Top Metric Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <!-- Card 1 (Live Total) -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 font-medium mb-1">Total Processed (MTD)</p>
-                <h3 id="totalProcessedStat" class="text-3xl font-bold text-blue-950 mb-2">0</h3>
-                <p class="text-xs text-green-600 bg-green-50 inline-block px-2 py-1 rounded font-medium">Live from database</p>
-            </div>
-            <!-- Card 2 -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 font-medium mb-1">Avg. Resolution Time</p>
-                <div class="flex items-baseline gap-2 mb-2">
-                    <h3 class="text-3xl font-bold text-blue-950">10</h3>
-                    <span class="text-gray-500 font-medium">Days</span>
-                </div>
-                <p class="text-xs text-green-600 bg-green-50 inline-block px-2 py-1 rounded font-medium">Down from 16.5 days</p>
-            </div>
-            <!-- Card 3 -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 font-medium mb-1">AI Routing Accuracy</p>
-                <h3 class="text-3xl font-bold text-blue-950 mb-2">75%</h3>
-                <p class="text-xs text-blue-700 bg-blue-50 inline-block px-2 py-1 rounded font-medium">Misallocation dropped to 25%</p>
-            </div>
-            <!-- Card 4 -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 font-medium mb-1">Citizen Satisfaction</p>
-                <h3 class="text-3xl font-bold text-blue-950 mb-2">63%</h3>
-                <p class="text-xs text-yellow-700 bg-yellow-50 inline-block px-2 py-1 rounded font-medium">Based on feedback loop</p>
-            </div>
+        <!-- Total Counter -->
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center max-w-sm mx-auto mb-12">
+            <h3 class="text-gray-400 font-bold uppercase tracking-wide text-xs mb-2">Total Grievances Processed</h3>
+            <p id="totalProcessedStat" class="text-5xl font-extrabold text-blue-950">...</p>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <!-- Bar Chart: Complaints by Department -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 class="text-lg font-bold text-blue-950 mb-6">Grievances by Department</h3>
-                <div class="relative h-72">
+        <!-- Chart Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Department Bar Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+                <h3 class="text-lg font-bold text-blue-950 mb-6">Department Load Overview</h3>
+                <div class="relative h-80 w-full">
                     <canvas id="deptChart"></canvas>
                 </div>
             </div>
 
-            <!-- Doughnut Chart: Overall Status -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 class="text-lg font-bold text-blue-950 mb-6">Current Status Breakdown</h3>
-                <div class="relative h-72 flex justify-center">
+            <!-- Status Doughnut Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-blue-950 mb-6">Resolution Status</h3>
+                <div class="relative h-80 w-full flex justify-center items-center">
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
+
         </div>
-
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-[#f8fafc] border-t border-gray-200 py-8 mt-auto">
+    
+    <footer class="bg-[#f8fafc] border-t border-gray-200 py-12 mt-12">
         <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-sm text-gray-400">&copy; 2026 Pimpri-Chinchwad Municipal Corporation. All rights reserved.</p>
+            <p class="text-sm text-gray-400">&copy; 2026 Pimpri-Chinchwad Municipal Corporation.</p>
         </div>
     </footer>
 
-    <!-- Connect JS Scripts -->
-    <script src="js/api.js"></script>
-    <script src="js/stats.js"></script>
+    <!-- Connect your JS file -->
+    <script src="js/public-stats.js"></script>
 </body>
 </html>

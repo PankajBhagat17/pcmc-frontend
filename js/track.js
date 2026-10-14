@@ -1,127 +1,174 @@
 document.addEventListener("DOMContentLoaded", () => {
     const trackForm = document.getElementById("trackForm");
+    const searchInput = document.getElementById("searchInput");
+    const trackSubmitBtn = document.getElementById("trackSubmitBtn");
+    const searchError = document.getElementById("searchError");
+    const resultContainer = document.getElementById("resultContainer");
+
+    // Display elements
+    const displayTicketId = document.getElementById("displayTicketId");
+    const displayDept = document.getElementById("displayDept");
+    const displayUrgency = document.getElementById("displayUrgency");
+    const displayDescription = document.getElementById("displayDescription");
+    const displayDate = document.getElementById("displayDate");
+    const displayLocation = document.getElementById("displayLocation");
+
+    // Timeline elements
+    const stepInProgress = document.getElementById("stepInProgress");
+    const stepResolved = document.getElementById("stepResolved");
+    
+    // Feedback elements
+    const feedbackBox = document.getElementById("feedbackBox");
+    const btnSatisfied = document.getElementById("btnSatisfied");
+    const btnUnsatisfied = document.getElementById("btnUnsatisfied");
+    const feedbackContent = document.getElementById("feedbackContent");
+
     let currentTicketId = null;
+
+    // Helper: Reset Timeline styling
+    const resetTimeline = () => {
+        stepInProgress.classList.add("opacity-40");
+        stepInProgress.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        
+        stepResolved.classList.add("opacity-40");
+        stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        
+        feedbackBox.classList.add("hidden");
+    };
 
     trackForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         
-        const input = document.getElementById("searchInput").value.trim();
-        const errorBox = document.getElementById("searchError");
-        const btn = document.getElementById("trackSubmitBtn");
+        const searchTerm = searchInput.value.trim().replace(/^PCMC-/i, ''); // Strip PCMC- if user typed it
         
-        if (input === '') return;
+        if (searchTerm.length < 5) {
+            searchError.innerText = "Please enter a valid Ticket ID.";
+            searchError.classList.remove("hidden");
+            return;
+        }
 
-        // Reset UI
-        errorBox.classList.add("hidden");
-        document.getElementById("resultContainer").classList.add("hidden");
-        document.getElementById("feedbackBox").classList.add("hidden");
-        
-        btn.innerText = "Searching...";
-        btn.disabled = true;
+        searchError.classList.add("hidden");
+        resultContainer.classList.add("hidden");
+        trackSubmitBtn.innerText = "Searching...";
+        trackSubmitBtn.disabled = true;
 
         try {
-            const ticket = await trackGrievance(input);
+            // Fetch all grievances to find the matching short ID
+            let response = await fetch('https://pcmc-admin.onrender.com/api/grievances');
+            if (response.status === 404) {
+                response = await fetch('https://pcmc-admin.onrender.com/grievances');
+            }
+
+            if (!response.ok) throw new Error("Database connection failed.");
+
+            const grievances = await response.json();
+            
+            // Find the ticket that includes the search term (case-insensitive)
+            const ticket = grievances.find(g => g._id.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            if (!ticket) {
+                searchError.innerText = "No grievance found with that Ticket ID. Please check and try again.";
+                searchError.classList.remove("hidden");
+                trackSubmitBtn.innerText = "Track Status";
+                trackSubmitBtn.disabled = false;
+                return;
+            }
+
             currentTicketId = ticket._id;
-            renderTicketDetails(ticket);
+
+            // 1. Populate Ticket Details
+            const formattedId = "PCMC-" + ticket._id.substring(0, 8).toUpperCase();
+            displayTicketId.innerText = formattedId;
+            displayDept.innerText = ticket.department || "Unassigned";
+            displayDescription.innerText = ticket.rawText || "No description provided.";
+            displayLocation.innerText = ticket.location || "Location not provided";
+            
+            const d = new Date(ticket.createdAt);
+            displayDate.innerText = d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            // Urgency Badge Styling
+            displayUrgency.innerText = ticket.urgency + " Urgency";
+            if (ticket.urgency === 'High' || ticket.urgency === 'Critical') {
+                displayUrgency.className = "px-3 py-1 rounded-md text-sm font-medium border text-red-700 bg-red-50 border-red-200";
+            } else {
+                displayUrgency.className = "px-3 py-1 rounded-md text-sm font-medium border text-gray-700 bg-gray-50 border-gray-200";
+            }
+
+            // 2. Update Timeline based on Status
+            resetTimeline();
+            
+            if (ticket.status === 'In-Progress' || ticket.status === 'Resolved') {
+                stepInProgress.classList.remove("opacity-40");
+                stepInProgress.querySelector("div").classList.replace("bg-gray-300", "bg-blue-950");
+            }
+            
+            if (ticket.status === 'Resolved') {
+                stepResolved.classList.remove("opacity-40");
+                stepResolved.querySelector("div").classList.replace("bg-gray-300", "bg-blue-950");
+                feedbackBox.classList.remove("hidden"); // Show accountability feedback loop
+            }
+
+            // Reveal results
+            resultContainer.classList.remove("hidden");
+
         } catch (error) {
-            errorBox.innerText = error.message;
-            errorBox.classList.remove("hidden");
+            console.error(error);
+            searchError.innerText = "Error fetching status. Please ensure the backend server is running.";
+            searchError.classList.remove("hidden");
         } finally {
-            btn.innerText = "Track Status";
-            btn.disabled = false;
+            trackSubmitBtn.innerText = "Track Status";
+            trackSubmitBtn.disabled = false;
         }
     });
 
-    function renderTicketDetails(ticket) {
-        // Unhide container
-        document.getElementById("resultContainer").classList.remove("hidden");
+    // 3. Handle Citizen Feedback (Resolved Tickets)
+    btnSatisfied.addEventListener("click", () => {
+        feedbackContent.innerHTML = `
+            <h3 class="text-lg font-bold mb-2">Thank you!</h3>
+            <p class="text-sm text-blue-200">Your confirmation helps us maintain high standards for Pimpri-Chinchwad.</p>
+        `;
+    });
 
-        // Populate Text Fields
-        document.getElementById("displayTicketId").innerText = ticket._id.substring(ticket._id.length - 8).toUpperCase();
-        document.getElementById("displayDept").innerText = ticket.department;
-        document.getElementById("displayDescription").innerText = `"${ticket.rawText}"`;
-        document.getElementById("displayDate").innerText = new Date(ticket.createdAt).toLocaleString();
-        document.getElementById("displayLocation").innerText = ticket.location;
-
-        // Populate Urgency Badge
-        const urgencyBadge = document.getElementById("displayUrgency");
-        urgencyBadge.innerText = `${ticket.urgency} Priority`;
-        if (ticket.urgency === 'High' || ticket.urgency === 'Critical') {
-            urgencyBadge.className = "px-3 py-1 rounded-md text-sm font-medium border bg-red-50 text-red-700 border-red-100";
-        } else if (ticket.urgency === 'Medium') {
-            urgencyBadge.className = "px-3 py-1 rounded-md text-sm font-medium border bg-yellow-50 text-yellow-700 border-yellow-100";
-        } else {
-            urgencyBadge.className = "px-3 py-1 rounded-md text-sm font-medium border bg-green-50 text-green-700 border-green-100";
-        }
-
-        // Timeline Logic
-        const stepInProgress = document.getElementById("stepInProgress");
-        const dotInProgress = stepInProgress.querySelector("div");
-        const stepResolved = document.getElementById("stepResolved");
-        const dotResolved = stepResolved.querySelector("div");
-
-        // Reset Timeline
-        stepInProgress.className = "relative opacity-40 transition-opacity";
-        dotInProgress.className = "absolute -left-[31px] bg-gray-300 h-4 w-4 rounded-full border-4 border-white shadow-sm";
-        stepResolved.className = "relative opacity-40 transition-opacity";
-        dotResolved.className = "absolute -left-[31px] bg-gray-300 h-4 w-4 rounded-full border-4 border-white";
-
-        if (ticket.status === 'In-Progress' || ticket.status === 'Resolved' || ticket.status === 'Reopened') {
-            stepInProgress.classList.remove("opacity-40");
-            dotInProgress.className = "absolute -left-[31px] bg-yellow-500 h-4 w-4 rounded-full border-4 border-white shadow-sm animate-pulse";
-        }
+    btnUnsatisfied.addEventListener("click", async () => {
+        if (!currentTicketId) return;
         
-        if (ticket.status === 'Resolved') {
-            dotInProgress.className = "absolute -left-[31px] bg-blue-950 h-4 w-4 rounded-full border-4 border-white shadow-sm";
-            stepResolved.classList.remove("opacity-40");
-            dotResolved.className = "absolute -left-[31px] bg-green-500 h-4 w-4 rounded-full border-4 border-white";
-            
-            // Accountability Loop Trigger
-            if (ticket.feedbackVerification === 'Pending') {
-                document.getElementById("feedbackBox").classList.remove("hidden");
-                document.getElementById("feedbackBox").classList.add("fade-in");
-            }
-        }
-    }
+        btnUnsatisfied.innerText = "Escalating...";
+        btnUnsatisfied.disabled = true;
 
-    // Feedback Event Listeners
-    document.getElementById("btnSatisfied").addEventListener("click", () => handleFeedback(true));
-    document.getElementById("btnUnsatisfied").addEventListener("click", () => handleFeedback(false));
-
-    async function handleFeedback(isSatisfied) {
-        const feedbackContent = document.getElementById("feedbackContent");
-        
         try {
-            await submitGrievanceFeedback(currentTicketId, isSatisfied);
-            
-            if (isSatisfied) {
-                feedbackContent.innerHTML = `
-                    <div class="text-center py-4 fade-in">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500/20 text-green-400 mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-white mb-1">Thank You!</h3>
-                        <p class="text-sm text-blue-200">Ticket officially closed.</p>
-                    </div>
-                `;
-            } else {
-                feedbackContent.innerHTML = `
-                    <div class="text-center py-4 fade-in">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/20 text-red-400 mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-white mb-1">Ticket Reopened</h3>
-                        <p class="text-sm text-blue-200">This has been escalated to higher administration.</p>
-                    </div>
-                `;
-                
-                // Visually update timeline to show reopened status
-                document.querySelector('#stepResolved div').className = "absolute -left-[31px] bg-red-500 h-4 w-4 rounded-full border-4 border-white";
-                document.querySelector('#stepResolved h4').innerText = "Reopened";
-                document.querySelector('#stepInProgress div').className = "absolute -left-[31px] bg-yellow-500 h-4 w-4 rounded-full border-4 border-white shadow-sm animate-pulse";
+            // Reopen ticket API call
+            let updateUrl = `https://pcmc-admin.onrender.com/api/grievances/${currentTicketId}/status`;
+            let res = await fetch(updateUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Reopened' }) // Re-opens the ticket
+            });
+
+            if (res.status === 404) {
+                updateUrl = `https://pcmc-admin.onrender.com/grievances/${currentTicketId}/status`;
+                res = await fetch(updateUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Reopened' })
+                });
             }
+
+            if (!res.ok) throw new Error("Failed to escalate");
+
+            feedbackContent.innerHTML = `
+                <h3 class="text-lg font-bold text-red-400 mb-2">Ticket Reopened & Escalated</h3>
+                <p class="text-sm text-blue-200">We apologize for the inconvenience. This issue has been pushed back to the Zonal Head for immediate review.</p>
+            `;
+            
+            // Adjust timeline visually to reflect reopened state
+            stepResolved.classList.add("opacity-40");
+            stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+
         } catch (error) {
-            alert("Error submitting feedback: " + error.message);
+            console.error(error);
+            alert("Error escalating ticket. Please try again later.");
+            btnUnsatisfied.innerText = "No, reopen & escalate ticket";
+            btnUnsatisfied.disabled = false;
         }
-    }
+    });
 });
