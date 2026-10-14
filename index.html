@@ -106,7 +106,7 @@
           </div>
 
           <!-- Geolocation Feature -->
-          <div class="mb-6 flex items-center gap-3">
+          <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <button type="button" id="getLocationBtn" class="flex items-center gap-2 bg-slate-100 text-slate-600 border border-slate-300 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
               <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path>
@@ -114,7 +114,7 @@
               </svg>
               Use My Current Location
             </button>
-            <span id="locationStatus" class="text-sm font-medium text-slate-500"></span>
+            <span id="locationStatus" class="text-xs sm:text-sm font-medium text-slate-500"></span>
           </div>
 
           <!-- AI Processing Box (Hidden initially) -->
@@ -240,7 +240,7 @@
     </div>
   </footer>
 
-  <!-- Geolocation Script -->
+  <!-- Geolocation Script with Live Reverse-Geocoding Display -->
   <script>
     window.currentLat = null;
     window.currentLng = null;
@@ -249,14 +249,28 @@
       const statusText = document.getElementById('locationStatus');
       
       if (navigator.geolocation) {
-          statusText.innerText = "Fetching location...";
+          statusText.innerText = "Fetching live location...";
           statusText.className = "text-sm font-medium text-blue-600";
           
           navigator.geolocation.getCurrentPosition(
-              (position) => {
+              async (position) => {
                   window.currentLat = position.coords.latitude;
                   window.currentLng = position.coords.longitude;
-                  statusText.innerText = "📍 Exact location captured!";
+                  
+                  try {
+                      // Fetch readable address via reverse geocoding API for immediate display
+                      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window.currentLat}&lon=${window.currentLng}`);
+                      if (res.ok) {
+                          const data = await res.json();
+                          const addressName = data.address.suburb || data.address.neighbourhood || data.address.city || data.display_name.split(',')[0];
+                          statusText.innerText = `📍 Live Location: ${addressName}`;
+                      } else {
+                          statusText.innerText = `📍 Live GPS: ${window.currentLat.toFixed(2)}, ${window.currentLng.toFixed(2)}`;
+                      }
+                  } catch (err) {
+                      statusText.innerText = `📍 GPS Acquired (${window.currentLat.toFixed(2)}, ${window.currentLng.toFixed(2)})`;
+                  }
+                  
                   statusText.className = "text-sm font-bold text-green-600";
               },
               (error) => {
