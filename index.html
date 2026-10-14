@@ -240,7 +240,7 @@
     </div>
   </footer>
 
-  <!-- Geolocation Script with Micro-Locality Prioritization -->
+  <!-- Geolocation Script with Full Google Maps Formatted Display -->
   <script>
     window.currentLat = null;
     window.currentLng = null;
@@ -249,7 +249,7 @@
       const statusText = document.getElementById('locationStatus');
       
       if (navigator.geolocation) {
-          statusText.innerText = "Auto-detecting micro-locality...";
+          statusText.innerText = "Fetching exact location...";
           statusText.className = "text-sm font-medium text-blue-600";
           
           navigator.geolocation.getCurrentPosition(
@@ -258,25 +258,15 @@
                   window.currentLng = position.coords.longitude;
                   
                   try {
-                      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window.currentLat}&lon=${window.currentLng}&addressdetails=1`);
+                      // Fetch full detailed place info using OpenStreetMap Nominatim API
+                      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${window.currentLat}&lon=${window.currentLng}&zoom=18&addressdetails=1`);
                       if (res.ok) {
                           const data = await res.json();
-                          const addr = data.address || {};
-                          
-                          // Prioritize micro-locality tags (neighbourhood, suburb, quarter, road)
-                          const microArea = addr.neighbourhood || addr.suburb || addr.quarter || addr.residential || '';
-                          const roadName = addr.road || addr.pedestrian || '';
-                          const postalCode = addr.postcode || '';
-                          
-                          let parts = [];
-                          if (microArea) parts.push(microArea);
-                          if (roadName && roadName !== microArea) parts.push(roadName);
-                          if (postalCode) parts.push(postalCode);
-                          
-                          const resolvedLocation = parts.length > 0 ? parts.join(', ') : (addr.city || "PCMC Area");
-                          statusText.innerText = `📍 Auto-detected: ${resolvedLocation}`;
+                          // Display the full human-readable address string returned by the mapping provider
+                          const fullAddress = data.display_name || `Lat: ${window.currentLat}, Lng: ${window.currentLng}`;
+                          statusText.innerHTML = `📍 <a href="https://www.google.com/maps?q=${window.currentLat},${window.currentLng}" target="_blank" class="underline text-blue-800 hover:text-blue-950" title="View on Google Maps">${fullAddress}</a>`;
                       } else {
-                          statusText.innerText = `📍 GPS: ${window.currentLat.toFixed(4)}, ${window.currentLng.toFixed(4)}`;
+                          statusText.innerText = `📍 GPS: ${window.currentLat.toFixed(6)}, ${window.currentLng.toFixed(6)}`;
                       }
                   } catch (err) {
                       statusText.innerText = `📍 GPS Acquired (${window.currentLat.toFixed(4)}, ${window.currentLng.toFixed(4)})`;
@@ -288,7 +278,8 @@
                   console.error("Location error:", error);
                   statusText.innerText = "❌ Please allow location permissions in your browser.";
                   statusText.className = "text-sm font-medium text-red-600";
-              }
+              },
+              { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
           );
       } else {
           statusText.innerText = "❌ Your browser does not support geolocation.";
