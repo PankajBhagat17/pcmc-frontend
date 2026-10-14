@@ -8,146 +8,148 @@
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
 
-    <!-- Top Navigation -->
-    <nav class="bg-white px-8 py-4 flex justify-between items-center shadow-sm flex-wrap gap-4">
-        <h1 class="text-xl font-bold text-blue-900 tracking-tight">PCMC Official Portal</h1>
+    <!-- Corrected Top Navigation for Officers -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <h1 class="text-xl font-bold text-blue-900">PCMC Official Portal</h1>
         
         <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-slate-600">
             <a href="admin.html" class="hover:text-blue-600 transition-colors">Dashboard</a>
             <a href="grievances.html" class="hover:text-blue-600 transition-colors">Grievances</a>
-            <a href="public-stats.html" class="hover:text-blue-600 transition-colors">Public Stats</a>
+            <a href="reports.html" class="hover:text-blue-600 transition-colors">Reports</a>
             <a href="departments.html" class="text-blue-600 border-b-2 border-blue-600 pb-1">Departments</a>
         </div>
         
-        <button class="bg-white text-slate-600 border border-slate-300 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 whitespace-nowrap">
-            Switch Dept
+        <button onclick="localStorage.removeItem('pcmc_token'); window.location.href='login.html'" class="text-sm font-semibold text-red-600 border border-red-200 px-4 py-2 rounded hover:bg-red-50 transition-colors">
+            Logout
         </button>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6 mt-4">
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">Municipal Departments Directory</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h2 class="text-2xl font-bold text-slate-800 bg-blue-600 text-white inline-block px-4 py-1 mb-8">Municipal Departments Directory</h2>
+        
+        <!-- Departments Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
             <!-- 1. Water Supply -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Water Supply & Drainage</h3>
-                    <span id="waterBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Water" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles pipeline leaks, contamination, and supply shortages.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="waterTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles pipeline leaks, contamination, and supply shortages.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Water" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
-            <!-- 2. Public Works (PWD) -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <!-- 2. PWD -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Public Works (PWD)</h3>
-                    <span id="roadBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Roads" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles potholes, poor road conditions, and bridge maintenance.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="roadTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles potholes, poor road conditions, and bridge maintenance.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Roads" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
             <!-- 3. Electrical -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Electrical Department</h3>
-                    <span id="electricBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Electrical" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles streetlight outages, exposed wiring, and power faults.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="electricTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles streetlight outages, exposed wiring, and power faults.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Electrical" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
             <!-- 4. Solid Waste -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Solid Waste Management</h3>
-                    <span id="wasteBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Waste" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles garbage collection, street sweeping, and dumpsters.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="wasteTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles garbage collection, street sweeping, and dumpsters.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Waste" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
             <!-- 5. Public Health -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Public Health</h3>
-                    <span id="healthBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Health" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles fogging, stray animal menaces, and disease control.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="healthTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles fogging, stray animal menaces, and disease control.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Health" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
             <!-- 6. Encroachment -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Encroachment</h3>
-                    <span id="encroachmentBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Encroachment" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles illegal construction, stall removals, and blocked paths.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="encroachmentTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles illegal construction, stall removals, and blocked paths.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Encroachment" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
             <!-- 7. Parks & Gardens -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Parks & Gardens</h3>
-                    <span id="parksBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Parks" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles tree trimming, fallen branches, and park maintenance.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="parksTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles tree trimming, fallen branches, and park maintenance.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Parks" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
-
+            
             <!-- 8. Property Tax -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">Property Tax</h3>
-                    <span id="taxBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Tax" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles tax assessments, billing issues, and payment errors.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="taxTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles tax assessments, billing issues, and payment errors.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Tax" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
 
-            <!-- 9. General Administration -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+            <!-- 9. General Admin -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-lg font-bold text-slate-800">General Admin</h3>
-                    <span id="adminBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                    <span id="badge-Admin" class="px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-500 rounded border border-slate-200">Syncing...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4 h-10">Handles general queries, staff complaints, and miscellaneous.</p>
-                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: <span id="adminTickets">0</span></span>
-                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                <p class="text-sm text-slate-500 mb-6 flex-grow">Handles general queries, staff complaints, and miscellaneous.</p>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                    <p class="text-sm font-bold text-slate-700">Open Tickets: <span id="count-Admin" class="text-blue-600 text-lg">0</span></p>
+                    <a href="admin.html" class="text-sm font-semibold text-blue-600 hover:underline">View Load →</a>
                 </div>
             </div>
+
         </div>
     </main>
 
-    <script src="js/api.js"></script>
     <script src="js/departments.js"></script>
 </body>
 </html>
