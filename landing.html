@@ -17,11 +17,10 @@
                 <svg class="w-6 h-6 sm:w-7 sm:h-7 text-blue-900" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
-                <!-- Title hides on very small mobile screens to prevent squishing, but logo stays -->
                 <a href="landing.html" class="hidden sm:block font-extrabold text-base sm:text-lg text-blue-950 tracking-tight hover:opacity-80 transition-opacity">PCMC Portal</a>
             </div>
 
-            <!-- Navigation Links (Now always visible!) -->
+            <!-- Navigation Links -->
             <nav class="flex items-center gap-4 sm:gap-8 text-sm font-medium text-slate-600">
                 <a href="landing.html" class="text-blue-900 font-semibold">Home</a>
 
@@ -31,7 +30,6 @@
                         About
                         <svg class="w-4 h-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
-                    <!-- Dropdown Menu (Centers on mobile to prevent going off-screen) -->
                     <div class="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-12 mt-1 w-64 sm:w-72 bg-white border border-slate-200 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div class="p-4 sm:p-5 text-left">
                             <h4 class="font-bold text-blue-950 text-sm mb-2 flex items-center gap-2">
@@ -46,14 +44,13 @@
                 </div>
             </nav>
 
-            <!-- Search & Login CTA -->
+            <!-- Login CTA -->
             <div class="flex items-center gap-4">
                 <div class="hidden lg:flex items-center bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-400">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     Search services...
                 </div>
                 
-                <!-- Fixed Login Link -->
                 <a href="login.html" class="bg-[#1e3a8a] hover:bg-blue-900 text-white px-5 sm:px-6 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm">
                     Login
                 </a>
@@ -62,11 +59,10 @@
         </div>
     </header>
 
-    <!-- Hero Section with Background -->
+    <!-- Hero Section -->
     <section class="relative bg-slate-900 text-white py-24 px-6 md:px-12 flex items-center justify-center overflow-hidden"
              style="background-image: url('js/pcmc-bg.jpg'); background-size: cover; background-position: center;">
         
-        <!-- Dark Blue Gradient Overlay -->
         <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-blue-950/80 to-slate-950/70 backdrop-blur-[2px]"></div>
 
         <div class="relative z-10 max-w-4xl text-center flex flex-col items-center">
@@ -84,11 +80,9 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                <!-- Links to Login page -->
                 <a href="login.html" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-8 rounded-xl text-sm transition-colors shadow-lg flex items-center justify-center gap-2">
                     File a Grievance <span>→</span>
                 </a>
-                <!-- Links to Signup page -->
                 <a href="signup.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold py-3.5 px-8 rounded-xl text-sm transition-colors backdrop-blur-sm flex items-center justify-center">
                     Create an Account
                 </a>
