@@ -15,11 +15,11 @@
         <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-slate-600">
             <a href="admin.html" class="hover:text-blue-600 transition-colors">Dashboard</a>
             <a href="grievances.html" class="hover:text-blue-600 transition-colors">Grievances</a>
-            <a href="reports.html" class="hover:text-blue-600 transition-colors">Reports</a>
+            <a href="public-stats.html" class="hover:text-blue-600 transition-colors">Public Stats</a>
             <a href="departments.html" class="text-blue-600 border-b-2 border-blue-600 pb-1">Departments</a>
         </div>
         
-        <button id="switchDeptBtn" class="bg-white text-slate-600 border border-slate-300 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 whitespace-nowrap">
+        <button class="bg-white text-slate-600 border border-slate-300 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 whitespace-nowrap">
             Switch Dept
         </button>
     </nav>
@@ -28,53 +28,126 @@
         <h2 class="text-2xl font-bold text-slate-800 mb-6">Municipal Departments Directory</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Department Card 1 -->
+            <!-- 1. Water Supply -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Water Supply</h3>
-                    <span class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs font-bold border border-red-100">High Load</span>
+                    <h3 class="text-lg font-bold text-slate-800">Water Supply & Drainage</h3>
+                    <span id="waterBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4">Handles pipeline leaks, contamination, and supply shortages.</p>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles pipeline leaks, contamination, and supply shortages.</p>
                 <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: 142</span>
-                    <button class="view-load-btn text-blue-600 font-bold group-hover:underline focus:outline-none" data-dept="Water Supply">
-                        View Load →
-                    </button>
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="waterTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
                 </div>
             </div>
 
-            <!-- Department Card 2 -->
+            <!-- 2. Public Works (PWD) -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Public Works & Roads</h3>
-                    <span class="bg-yellow-50 text-yellow-700 px-2 py-1 rounded text-xs font-bold border border-yellow-100">Medium Load</span>
+                    <h3 class="text-lg font-bold text-slate-800">Public Works (PWD)</h3>
+                    <span id="roadBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4">Handles potholes, unauthorized construction, and road safety.</p>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles potholes, poor road conditions, and bridge maintenance.</p>
                 <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: 85</span>
-                    <button class="view-load-btn text-blue-600 font-bold group-hover:underline focus:outline-none" data-dept="Public Works & Roads">
-                        View Load →
-                    </button>
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="roadTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
                 </div>
             </div>
 
-            <!-- Department Card 3 -->
+            <!-- 3. Electrical -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Electrical Dept</h3>
-                    <span class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-bold border border-green-100">Optimal</span>
+                    <h3 class="text-lg font-bold text-slate-800">Electrical Department</h3>
+                    <span id="electricBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4">Handles streetlight outages and municipal power faults.</p>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles streetlight outages, exposed wiring, and power faults.</p>
                 <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
-                    <span class="font-semibold text-slate-700">Open Tickets: 12</span>
-                    <button class="view-load-btn text-blue-600 font-bold group-hover:underline focus:outline-none" data-dept="Electrical Dept">
-                        View Load →
-                    </button>
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="electricTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 4. Solid Waste -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Solid Waste Management</h3>
+                    <span id="wasteBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles garbage collection, street sweeping, and dumpsters.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="wasteTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 5. Public Health -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Public Health</h3>
+                    <span id="healthBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles fogging, stray animal menaces, and disease control.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="healthTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 6. Encroachment -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Encroachment</h3>
+                    <span id="encroachmentBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles illegal construction, stall removals, and blocked paths.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="encroachmentTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 7. Parks & Gardens -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Parks & Gardens</h3>
+                    <span id="parksBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles tree trimming, fallen branches, and park maintenance.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="parksTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 8. Property Tax -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Property Tax</h3>
+                    <span id="taxBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles tax assessments, billing issues, and payment errors.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="taxTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
+                </div>
+            </div>
+
+            <!-- 9. General Administration -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-300 transition-colors group">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">General Admin</h3>
+                    <span id="adminBadge" class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold border border-slate-200">Loading...</span>
+                </div>
+                <p class="text-sm text-slate-500 mb-4 h-10">Handles general queries, staff complaints, and miscellaneous.</p>
+                <div class="flex justify-between items-center text-sm pt-4 border-t border-slate-100">
+                    <span class="font-semibold text-slate-700">Open Tickets: <span id="adminTickets">0</span></span>
+                    <button class="text-blue-600 font-bold group-hover:underline focus:outline-none">View Load →</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="js/admin.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/departments.js"></script>
 </body>
 </html>

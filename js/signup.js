@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById("signupPassword").value;
         const confirmPassword = document.getElementById("signupConfirmPassword").value;
 
-        // Client-side validation for password matching
+        // Check passwords match
         if (password !== confirmPassword) {
             errorBox.innerText = "Passwords do not match!";
             errorBox.classList.remove("hidden");
             return;
         }
 
-        // Set UI to loading state
+        // Show loading state
         submitBtn.innerHTML = `Creating Account...`;
         submitBtn.disabled = true;
         submitBtn.classList.add("opacity-75", "cursor-not-allowed");
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const mobileNumber = document.getElementById("signupMobile").value;
 
-        // 🔴 PLACEHOLDER: Ensure these keys match the backend MongoDB schema
+        // Prepare data to send to backend
         const payload = {
             fullName: document.getElementById("signupName").value,
             email: document.getElementById("signupEmail").value,
@@ -40,19 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            // Send to backend via api.js
-            await registerUser(payload);
+            // Send data to backend (using the function from api.js)
+            const response = await registerUser(payload);
             
-            // MVP HACK: Save the mobile number to localStorage to mark them as logged in
-            localStorage.setItem('citizen_id', mobileNumber);
+            // Save token to browser storage
+            localStorage.setItem('pcmc_token', response.token);
             
             alert("✅ Account created successfully!\n\nYour address details have been saved to your profile for faster grievance filing.");
-            window.location.href = "index.html"; // Send them straight to the portal!
+            window.location.href = "login.html"; 
 
         } catch (error) {
+            // Show error message if something fails
             errorBox.innerText = error.message;
             errorBox.classList.remove("hidden");
             
+            // Reset button
             submitBtn.innerHTML = `Sign Up`;
             submitBtn.disabled = false;
             submitBtn.classList.remove("opacity-75", "cursor-not-allowed");

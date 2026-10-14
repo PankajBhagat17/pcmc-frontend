@@ -55,11 +55,11 @@
 
         <!-- Top Metric Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <!-- Card 1 -->
+            <!-- Card 1 (Live Total) -->
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <p class="text-sm text-gray-500 font-medium mb-1">Total Processed (MTD)</p>
-                <h3 class="text-3xl font-bold text-blue-950 mb-2">8,076</h3>
-                <p class="text-xs text-green-600 bg-green-50 inline-block px-2 py-1 rounded font-medium">+12% from last month</p>
+                <h3 id="totalProcessedStat" class="text-3xl font-bold text-blue-950 mb-2">0</h3>
+                <p class="text-xs text-green-600 bg-green-50 inline-block px-2 py-1 rounded font-medium">Live from database</p>
             </div>
             <!-- Card 2 -->
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -112,74 +112,8 @@
         </div>
     </footer>
 
-    <!-- Chart.js Initialization Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // 1. Bar Chart Configuration (Departments)
-            const deptCtx = document.getElementById('deptChart').getContext('2d');
-            new Chart(deptCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Roads', 'Water Supply', 'Sanitation', 'Public Health', 'Encroachment'],
-                    datasets: [{
-                        label: 'Active Grievances',
-                        data: [1240, 950, 680, 420, 210],
-                        backgroundColor: '#1e3a8a', // blue-900
-                        borderRadius: 6,
-                        barPercentage: 0.6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#f1f5f9' },
-                            border: { display: false }
-                        },
-                        x: {
-                            grid: { display: false },
-                            border: { display: false }
-                        }
-                    }
-                }
-            });
-
-            // 2. Doughnut Chart Configuration (Status)
-            const statusCtx = document.getElementById('statusChart').getContext('2d');
-            new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Resolved', 'In Progress', 'Pending Allocation'],
-                    datasets: [{
-                        data: [5349, 1820, 907], // Totals roughly matching the 8,076 stat
-                        backgroundColor: [
-                            '#10b981', // emerald-500 (Resolved)
-                            '#f59e0b', // amber-500 (In Progress)
-                            '#94a3b8'  // slate-400 (Pending)
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { padding: 20, usePointStyle: true, boxWidth: 8 }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+    <!-- Connect JS Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/stats.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports & Analytics - PCMC Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
 
@@ -28,19 +29,19 @@
         <h2 class="text-2xl font-bold text-slate-800 mb-6">Performance Analytics</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Mock Chart Area 1 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-80 flex flex-col justify-between">
-                <h3 class="font-bold text-slate-700">Resolution Time Trend (Last 30 Days)</h3>
-                <div class="flex-grow flex items-center justify-center border-2 border-dashed border-slate-100 mt-4 rounded bg-slate-50">
-                    <p class="text-slate-400 text-sm font-semibold">[ Chart Visualization Placeholder ]</p>
+            <!-- Line Chart Area -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-80 flex flex-col">
+                <h3 class="font-bold text-slate-700 mb-4">Avg. Resolution Time (Days) - MTD</h3>
+                <div class="flex-grow relative w-full h-full">
+                    <canvas id="trendChart"></canvas>
                 </div>
             </div>
             
-            <!-- Mock Chart Area 2 -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-80 flex flex-col justify-between">
-                <h3 class="font-bold text-slate-700">Grievances by Category</h3>
-                <div class="flex-grow flex items-center justify-center border-2 border-dashed border-slate-100 mt-4 rounded bg-slate-50">
-                    <p class="text-slate-400 text-sm font-semibold">[ Pie Chart Placeholder ]</p>
+            <!-- Doughnut Chart Area -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-80 flex flex-col">
+                <h3 class="font-bold text-slate-700 mb-4">Live Departmental Load</h3>
+                <div class="flex-grow relative w-full h-full flex justify-center">
+                    <canvas id="categoryChart"></canvas>
                 </div>
             </div>
         </div>
@@ -52,12 +53,15 @@
                 <p class="text-sm text-slate-500">Download formatted data for auditing and municipal presentations.</p>
             </div>
             <div class="flex gap-3 w-full md:w-auto">
-                <button id="exportPdfBtn" class="flex-1 md:flex-none border border-slate-300 text-slate-700 px-4 py-2 rounded text-sm font-bold hover:bg-slate-50 transition-colors">Export PDF</button>
-                <button id="exportCsvBtn" class="flex-1 md:flex-none bg-blue-900 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-800 transition-colors">Export CSV</button>
+                <button id="exportCsvBtn" class="flex-1 md:flex-none bg-blue-900 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-800 transition-colors shadow-sm">
+                    Export Raw CSV Data
+                </button>
             </div>
         </section>
     </main>
 
-    <script src="js/admin.js"></script>
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/reports.js"></script>
 </body>
 </html>

@@ -62,20 +62,22 @@
                     <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
                         <tr>
                             <th class="px-6 py-4">ID</th>
-                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Category / Issue</th>
                             <th class="px-6 py-4">Urgency</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="grievancesTableBody" class="divide-y divide-slate-100">
-                        <!-- JS injects rows here -->
+                        <tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Loading live grievances...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
     </main>
     
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
