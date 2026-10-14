@@ -5,10 +5,10 @@
 // Automatically detect if we are running locally or on the live Vercel site
 const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-// TODO: Replace 'https://pcmc-backend.onrender.com/api' with your actual live backend URL after Step 2
+// UPDATED: Points to your live pcmc-admin Render backend
 const BASE_URL = IS_LOCAL 
-    ? "https://pcmc-admin.onrender.com" 
-    : "https://pcmc-backend.onrender.com/api"; 
+    ? "http://localhost:3000/api" 
+    : "https://pcmc-admin.onrender.com/api"; 
 
 // Helper function to get auth headers
 function getAuthHeaders() {
@@ -142,18 +142,4 @@ async function updateTicketStatus(ticketId, status) {
     }
 }
 
-async function getPublicStats() {
-    try {
-        const response = await fetch(`${BASE_URL}/grievances/stats`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Failed to load stats.');
-        return data;
-    } catch (error) {
-        console.error("Stats API Error:", error);
-        throw error;
-    }
-}
+async
