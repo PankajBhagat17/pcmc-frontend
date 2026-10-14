@@ -19,8 +19,8 @@
             <a href="departments.html" class="hover:text-blue-600 transition-colors">Departments</a>
         </div>
         
-        <button id="switchDeptBtn" class="text-sm font-semibold text-slate-600 border border-slate-300 px-4 py-2 rounded hover:bg-slate-50 transition-colors">
-            Switch Dept
+        <button onclick="localStorage.removeItem('pcmc_token'); window.location.href='login.html'" class="text-sm font-semibold text-red-600 border border-red-200 px-4 py-2 rounded hover:bg-red-50 transition-colors">
+            Logout
         </button>
     </nav>
 
@@ -30,33 +30,34 @@
         <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
             <div>
                 <h2 class="text-2xl font-bold text-slate-800">Grievance Dashboard</h2>
-                <p class="text-slate-500 text-sm mt-1">Overview of current civic complaints and operational metrics.</p>
+                <p class="text-slate-500 text-sm mt-1">Real-time overview of civic complaints and operational metrics.</p>
             </div>
-            <button id="exportReportBtn" class="text-sm font-semibold bg-white border border-slate-300 px-4 py-2 rounded shadow-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
+            <button class="text-sm font-semibold bg-white border border-slate-300 px-4 py-2 rounded shadow-sm flex items-center gap-2 hover:bg-slate-50 transition-colors">
                 Export Report
             </button>
         </div>
 
+        <!-- DYNAMIC STATS CARDS -->
         <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Total Pending</h3>
-                <p class="text-4xl font-bold text-slate-800">4,281</p>
-                <p class="text-xs text-slate-500 mt-2">↗ +12% since last week</p>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Total Grievances</h3>
+                <p id="statTotal" class="text-4xl font-bold text-slate-800">...</p>
+                <p class="text-xs text-slate-500 mt-2">All time tickets</p>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Resolved Today</h3>
-                <p class="text-4xl font-bold text-green-600">342</p>
-                <p class="text-xs text-slate-500 mt-2">↗ Above daily average</p>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Pending Action</h3>
+                <p id="statPending" class="text-4xl font-bold text-orange-500">...</p>
+                <p class="text-xs text-slate-500 mt-2">New & In-Progress</p>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Escalated / Critical</h3>
-                <p class="text-4xl font-bold text-red-600">89</p>
-                <p class="text-xs text-red-500 mt-2 font-medium">! Immediate action required</p>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Resolved</h3>
+                <p id="statResolved" class="text-4xl font-bold text-green-600">...</p>
+                <p class="text-xs text-slate-500 mt-2">Successfully closed</p>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">Average TAT</h3>
-                <p class="text-4xl font-bold text-blue-900">48<span class="text-xl">hrs</span></p>
-                <p class="text-xs text-slate-500 mt-2">↘ Down 2 hrs from last month</p>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-wide mb-2">High Urgency</h3>
+                <p id="statUrgent" class="text-4xl font-bold text-red-600">...</p>
+                <p class="text-xs text-red-500 mt-2 font-medium">! Requires attention</p>
             </div>
         </section>
 
@@ -65,14 +66,8 @@
             <div class="p-5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
                 <h3 class="text-lg font-bold text-slate-800">Complaint Queue</h3>
                 <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                    <!-- Added ID to Search -->
                     <input type="text" id="searchInput" placeholder="Search ID or Keyword..." class="text-sm border border-slate-300 rounded px-3 py-2 w-full md:w-64 focus:ring-2 focus:ring-blue-500 outline-none">
                     
-                    <select class="text-sm border border-slate-300 rounded px-3 py-2 bg-white flex-1 md:flex-none">
-                        <option>All Departments</option>
-                    </select>
-                    
-                    <!-- Added ID and options to Urgency Dropdown -->
                     <select id="urgencyFilter" class="text-sm border border-slate-300 rounded px-3 py-2 bg-white flex-1 md:flex-none">
                         <option value="All">All Urgency</option>
                         <option value="High">High</option>
@@ -88,7 +83,7 @@
                         <tr>
                             <th class="px-6 py-4">ID</th>
                             <th class="px-6 py-4">Date</th>
-                            <th class="px-6 py-4">Language</th>
+                            <th class="px-6 py-4">Location</th>
                             <th class="px-6 py-4">Category</th>
                             <th class="px-6 py-4">Urgency</th>
                             <th class="px-6 py-4">Status</th>
@@ -96,7 +91,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100" id="tableBody">
-                        <!-- JS injects rows here -->
+                        <tr><td colspan="7" class="px-6 py-4 text-center text-slate-500">Loading live data...</td></tr>
                     </tbody>
                 </table>
             </div>

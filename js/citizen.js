@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (textarea && aiBox && grievanceForm) {
         
-        // 1. Simulate AI analyzing context as the user types
         textarea.addEventListener("input", function () {
             if (this.value.length > 20) {
                 if (aiBox.classList.contains("hidden")) {
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // 2. Handle the submission flow to the backend
         grievanceForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -61,14 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
             btnLoader.classList.remove("hidden");
 
             try {
-                // Send manual location to backend API
                 const response = await submitGrievance({
                     rawText: textValue,
                     userId: currentUserId,
                     location: locationValue
                 });
 
-                alert("Grievance Submitted Successfully! Ticket ID: " + response.grievance._id);
+                // PROPER TICKET ID FORMATTING 
+                const cleanId = response.grievance._id.substring(0, 8).toUpperCase();
+                alert(`Grievance Submitted Successfully! Ticket ID: PCMC-${cleanId}`);
 
                 grievanceForm.reset();
                 aiBox.classList.add("hidden");

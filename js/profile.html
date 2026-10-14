@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - PCMC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+    <!-- Navbar -->
+    <header class="w-full border-b border-gray-100 bg-white sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="landing.html" class="flex items-center gap-2">
+                    <span class="font-bold text-lg text-blue-950">PCMC Grievance Portal</span>
+                </a>
+                <nav class="hidden md:flex gap-8">
+                    <a href="landing.html" class="text-sm font-medium text-gray-500 hover:text-blue-950">Home</a>
+                    <a href="profile.html" class="text-sm font-semibold text-blue-950 border-b-2 border-blue-950 pb-1">My Profile</a>
+                </nav>
+                <button onclick="localStorage.removeItem('pcmc_token'); window.location.href='login.html'" class="text-sm font-medium text-red-600 bg-red-50 px-4 py-2 rounded-md hover:bg-red-100 border border-red-200 transition-colors">Log Out</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-6 mt-8">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800">My Grievances</h2>
+            <p class="text-slate-500 mt-1">Track the real-time status of the complaints you have submitted.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4">Ticket ID</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="profileTableBody" class="divide-y divide-slate-100">
+                        <tr><td colspan="4" class="px-6 py-4 text-center text-slate-500">Loading your profile data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <script src="js/profile.js"></script>
+</body>
+</html>
