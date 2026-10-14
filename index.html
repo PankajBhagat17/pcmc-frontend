@@ -31,19 +31,20 @@
   <header class="w-full border-b border-gray-100 bg-white sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <!-- Logo -->
-        <div class="flex items-center gap-2">
+        <!-- Logo (Redirects to landing.html) -->
+        <a href="landing.html" class="flex items-center gap-2">
           <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
             </path>
           </svg>
           <span class="font-bold text-lg text-blue-950 tracking-tight">PCMC Grievance Portal</span>
-        </div>
+        </a>
 
         <!-- Center Links -->
         <nav class="hidden md:flex gap-8">
-          <a href="index.html" class="text-sm font-semibold text-blue-950 border-b-2 border-blue-950 pb-1">Home</a>
+          <!-- Home Link (Redirects to landing.html) -->
+          <a href="landing.html" class="text-sm font-semibold text-blue-950 border-b-2 border-blue-950 pb-1">Home</a>
           <a href="track-status.html"
             class="text-sm font-medium text-gray-500 hover:text-blue-950 transition-colors">Track</a>
           <a href="public-stats.html"
@@ -239,9 +240,8 @@
     </div>
   </footer>
 
-  <!-- Geolocation Script (MUST be above citizen.js) -->
+  <!-- Geolocation Script -->
   <script>
-    // Create global variables for coordinates so citizen.js can use them
     window.currentLat = null;
     window.currentLng = null;
 
@@ -272,10 +272,8 @@
     });
   </script>
 
-  <!-- 1. Import your API connection file -->
+  <!-- Connect JS Scripts -->
   <script src="js/api.js"></script>
-
-  <!-- 2. Logic Script -->
   <script src="js/citizen.js"></script>
 </body>
 
