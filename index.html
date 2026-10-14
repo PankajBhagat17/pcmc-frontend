@@ -240,7 +240,7 @@
     </div>
   </footer>
 
-  <!-- Geolocation Script with Detailed Granular Address Parsing -->
+  <!-- Geolocation Script with Micro-Locality Prioritization -->
   <script>
     window.currentLat = null;
     window.currentLng = null;
@@ -249,7 +249,7 @@
       const statusText = document.getElementById('locationStatus');
       
       if (navigator.geolocation) {
-          statusText.innerText = "Fetching exact location details...";
+          statusText.innerText = "Auto-detecting micro-locality...";
           statusText.className = "text-sm font-medium text-blue-600";
           
           navigator.geolocation.getCurrentPosition(
@@ -263,21 +263,18 @@
                           const data = await res.json();
                           const addr = data.address || {};
                           
-                          // Extract granular components (building/society, road, suburb/area, postcode)
-                          const building = addr.building || addr.residential || addr.house_number || '';
-                          const road = addr.road || addr.pedestrian || '';
-                          const area = addr.suburb || addr.neighbourhood || addr.city_district || addr.town || '';
-                          const postcode = addr.postcode || '';
+                          // Prioritize micro-locality tags (neighbourhood, suburb, quarter, road)
+                          const microArea = addr.neighbourhood || addr.suburb || addr.quarter || addr.residential || '';
+                          const roadName = addr.road || addr.pedestrian || '';
+                          const postalCode = addr.postcode || '';
                           
-                          // Build a clean, highly descriptive address string
-                          let addressParts = [];
-                          if (building) addressParts.push(building);
-                          if (road) addressParts.push(road);
-                          if (area) addressParts.push(area);
-                          if (postcode) addressParts.push(postcode);
+                          let parts = [];
+                          if (microArea) parts.push(microArea);
+                          if (roadName && roadName !== microArea) parts.push(roadName);
+                          if (postalCode) parts.push(postalCode);
                           
-                          const detailedString = addressParts.length > 0 ? addressParts.join(', ') : data.display_name;
-                          statusText.innerText = `📍 ${detailedString}`;
+                          const resolvedLocation = parts.length > 0 ? parts.join(', ') : (addr.city || "PCMC Area");
+                          statusText.innerText = `📍 Auto-detected: ${resolvedLocation}`;
                       } else {
                           statusText.innerText = `📍 GPS: ${window.currentLat.toFixed(4)}, ${window.currentLng.toFixed(4)}`;
                       }
