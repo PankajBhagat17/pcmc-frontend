@@ -53,11 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
         trackSubmitBtn.disabled = true;
 
         try {
-            // Fetch all grievances to find the matching short ID
-            let response = await fetch('https://pcmc-admin.onrender.com/api/grievances');
-            if (response.status === 404) {
-                response = await fetch('https://pcmc-admin.onrender.com/grievances');
-            }
+            // Fetch all grievances using the dynamic BASE_URL from api.js
+            const response = await fetch(`${BASE_URL}/grievances`);
 
             if (!response.ok) throw new Error("Database connection failed.");
 
@@ -136,22 +133,16 @@ document.addEventListener("DOMContentLoaded", () => {
         btnUnsatisfied.disabled = true;
 
         try {
-            // Reopen ticket API call
-            let updateUrl = `https://pcmc-admin.onrender.com/api/grievances/${currentTicketId}/status`;
-            let res = await fetch(updateUrl, {
+            // Reopen ticket API call using BASE_URL and auth headers if available
+            const updateUrl = `${BASE_URL}/grievances/${currentTicketId}/status`;
+            const res = await fetch(updateUrl, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Reopened' }) // Re-opens the ticket
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('pcmc_token') || ''}`
+                },
+                body: JSON.stringify({ status: 'Reopened' })
             });
-
-            if (res.status === 404) {
-                updateUrl = `https://pcmc-admin.onrender.com/grievances/${currentTicketId}/status`;
-                res = await fetch(updateUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'Reopened' })
-                });
-            }
 
             if (!res.ok) throw new Error("Failed to escalate");
 

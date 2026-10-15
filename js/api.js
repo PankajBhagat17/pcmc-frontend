@@ -5,7 +5,7 @@
 // Automatically detect if we are running locally or on the live Vercel site
 const IS_LOCAL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-// UPDATED: Points to your live pcmc-admin Render backend
+// Points to your live pcmc-admin Render backend
 const BASE_URL = IS_LOCAL 
     ? "http://localhost:3000/api" 
     : "https://pcmc-admin.onrender.com/api"; 
@@ -15,7 +15,7 @@ function getAuthHeaders() {
     const token = localStorage.getItem('pcmc_token');
     return {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // This tells the backend WHO is submitting
+        'Authorization': `Bearer ${token}` // Tells the backend WHO is submitting
     };
 }
 
@@ -61,7 +61,8 @@ async function registerUser(userData) {
 // ==========================================
 async function submitGrievance(grievanceData) {
     try {
-        const response = await fetch(`${BASE_URL}/grievances/submit`, {
+        // Fixed: matches backend route POST /api/grievances
+        const response = await fetch(`${BASE_URL}/grievances`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(grievanceData)
@@ -78,9 +79,10 @@ async function submitGrievance(grievanceData) {
 
 async function getAllGrievances() {
     try {
-        const response = await fetch(`${BASE_URL}/grievances/all`, {
+        // Fixed: matches backend route GET /api/grievances
+        const response = await fetch(`${BASE_URL}/grievances`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: getAuthHeaders() // Added auth headers for admin fetching
         });
         
         const data = await response.json();
@@ -108,27 +110,11 @@ async function trackGrievance(ticketId) {
     }
 }
 
-async function submitGrievanceFeedback(ticketId, isSatisfied) {
-    try {
-        const response = await fetch(`${BASE_URL}/grievances/${ticketId}/feedback`, {
-            method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ isSatisfied })
-        });
-        
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Failed to submit feedback.');
-        return data;
-    } catch (error) {
-        console.error("Feedback Error:", error);
-        throw error;
-    }
-}
-
 async function updateTicketStatus(ticketId, status) {
     try {
+        // Fixed: matches backend route PUT /api/grievances/:id/status
         const response = await fetch(`${BASE_URL}/grievances/${ticketId}/status`, {
-            method: 'PATCH',
+            method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify({ status })
         });
@@ -141,5 +127,3 @@ async function updateTicketStatus(ticketId, status) {
         throw error;
     }
 }
-
-async
