@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         // FIXED: Added /all to match your backend routes
-        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

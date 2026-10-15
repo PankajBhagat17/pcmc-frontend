@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         // Fetch ONLY from the reliable master list, bypassing the broken stats route
-        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-        // 3. Fetch ALL grievances using the route we know works
-        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+        // FIXED: Removed /all to match your live backend router
+        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

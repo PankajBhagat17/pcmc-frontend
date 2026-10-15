@@ -63,8 +63,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3. Fetch live data
     try {
-        // FIXED: Added /all to match backend routes
-        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+        // FIXED: Removed /all to match your live backend routes
+        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
