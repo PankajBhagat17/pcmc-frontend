@@ -8,23 +8,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // 2. Helper function for styling the load badges
+    // 2. Helper function for styling the load badges matching department.html IDs
     const updateLoadBadge = (badgeElement, count) => {
         if (!badgeElement) return;
         if (count >= 10) {
-            badgeElement.className = "bg-red-50 text-red-700 px-2 py-1 rounded text-xs font-bold border border-red-200";
+            badgeElement.className = "px-2 py-1 text-xs font-bold bg-red-50 text-red-700 rounded border border-red-200";
             badgeElement.innerText = "High Load";
         } else if (count >= 5) {
-            badgeElement.className = "bg-yellow-50 text-yellow-700 px-2 py-1 rounded text-xs font-bold border border-yellow-200";
+            badgeElement.className = "px-2 py-1 text-xs font-bold bg-yellow-50 text-yellow-700 rounded border border-yellow-200";
             badgeElement.innerText = "Medium Load";
         } else {
-            badgeElement.className = "bg-green-50 text-green-700 px-2 py-1 rounded text-xs font-bold border border-green-200";
+            badgeElement.className = "px-2 py-1 text-xs font-bold bg-green-50 text-green-700 rounded border border-green-200";
             badgeElement.innerText = "Optimal";
         }
     };
 
     try {
-        // FIXED: Removed /all to match your live backend router
         const response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -33,46 +32,46 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const allGrievances = await response.json();
         
-        // 4. Initialize counts
+        // 3. Initialize counts matching your department categories
         const counts = {
-            water: 0, road: 0, electric: 0, waste: 0, 
-            health: 0, encroachment: 0, parks: 0, tax: 0, admin: 0
+            Water: 0, Roads: 0, Electrical: 0, Waste: 0, 
+            Health: 0, Encroachment: 0, Parks: 0, Tax: 0, Admin: 0
         };
 
-        // 5. Calculate stats client-side from the master list
+        // 4. Calculate stats client-side from the master list
         allGrievances.forEach(ticket => {
             const deptName = (ticket.department || "").toLowerCase();
             
-            if (deptName.includes("water") || deptName.includes("drainage")) counts.water++;
-            else if (deptName.includes("road") || deptName.includes("pwd") || deptName.includes("public works")) counts.road++;
-            else if (deptName.includes("electric") || deptName.includes("light") || deptName.includes("power")) counts.electric++;
-            else if (deptName.includes("waste") || deptName.includes("solid")) counts.waste++;
-            else if (deptName.includes("health") || deptName.includes("animal") || deptName.includes("dog")) counts.health++;
-            else if (deptName.includes("encroach") || deptName.includes("illegal")) counts.encroachment++;
-            else if (deptName.includes("park") || deptName.includes("garden") || deptName.includes("tree")) counts.parks++;
-            else if (deptName.includes("tax") || deptName.includes("property")) counts.tax++;
-            else counts.admin++;
+            if (deptName.includes("water") || deptName.includes("drainage")) counts.Water++;
+            else if (deptName.includes("road") || deptName.includes("pwd") || deptName.includes("public works")) counts.Roads++;
+            else if (deptName.includes("electric") || deptName.includes("light") || deptName.includes("power")) counts.Electrical++;
+            else if (deptName.includes("waste") || deptName.includes("solid")) counts.Waste++;
+            else if (deptName.includes("health") || deptName.includes("animal") || deptName.includes("dog")) counts.Health++;
+            else if (deptName.includes("encroach") || deptName.includes("illegal")) counts.Encroachment++;
+            else if (deptName.includes("park") || deptName.includes("garden") || deptName.includes("tree")) counts.Parks++;
+            else if (deptName.includes("tax") || deptName.includes("property")) counts.Tax++;
+            else counts.Admin++;
         });
 
-        // 6. Array mapping UI IDs to the count variables
+        // 5. Array mapping department.html ID keys to counts
         const deptMap = [
-            { id: "water", count: counts.water },
-            { id: "road", count: counts.road },
-            { id: "electric", count: counts.electric },
-            { id: "waste", count: counts.waste },
-            { id: "health", count: counts.health },
-            { id: "encroachment", count: counts.encroachment },
-            { id: "parks", count: counts.parks },
-            { id: "tax", count: counts.tax },
-            { id: "admin", count: counts.admin }
+            { key: "Water", count: counts.Water },
+            { key: "Roads", count: counts.Roads },
+            { key: "Electrical", count: counts.Electrical },
+            { key: "Waste", count: counts.Waste },
+            { key: "Health", count: counts.Health },
+            { key: "Encroachment", count: counts.Encroachment },
+            { key: "Parks", count: counts.Parks },
+            { key: "Tax", count: counts.Tax },
+            { key: "Admin", count: counts.Admin }
         ];
 
-        // 7. Loop through and update UI
+        // 6. Loop through and update UI using your exact HTML element IDs (`count-X` and `badge-X`)
         deptMap.forEach(d => {
-            const ticketEl = document.getElementById(`${d.id}Tickets`);
-            const badgeEl = document.getElementById(`${d.id}Badge`);
+            const countEl = document.getElementById(`count-${d.key}`);
+            const badgeEl = document.getElementById(`badge-${d.key}`);
             
-            if (ticketEl) ticketEl.innerText = d.count;
+            if (countEl) countEl.innerText = d.count;
             if (badgeEl) updateLoadBadge(badgeEl, d.count);
         });
 
@@ -80,10 +79,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Failed to load department stats:", error);
         
         // Visual error state if backend is down
-        const badges = document.querySelectorAll('[id$="Badge"]');
+        const badges = document.querySelectorAll('[id^="badge-"]');
         badges.forEach(badge => {
             badge.innerText = "Error";
-            badge.className = "bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold border border-red-200";
+            badge.className = "px-2 py-1 text-xs font-bold bg-red-50 text-red-600 rounded border border-red-200";
         });
     }
 });
