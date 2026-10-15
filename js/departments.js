@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
     
-    // 1. Helper function for styling the load badges
+    // 1. Authenticate Officer
+    const token = localStorage.getItem("pcmc_token");
+    if (!token) {
+        alert("Session expired. Please log in.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // 2. Helper function for styling the load badges
     const updateLoadBadge = (badgeElement, count) => {
         if (!badgeElement) return;
         if (count >= 10) {
@@ -16,42 +24,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-        // 2. Fetch the live stats directly from your backend
-        let response = await fetch('https://pcmc-admin.onrender.com/api/stats');
-        
-        // Fallback route just in case
-        if (response.status === 404) {
-            response = await fetch('https://pcmc-admin.onrender.com/stats');
-        }
+        // 3. Fetch ALL grievances using the route we know works
+        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch stats from server.");
+        if (!response.ok) throw new Error("Failed to fetch data from server.");
 
-        const stats = await response.json();
+        const allGrievances = await response.json();
         
-        // 3. Initialize counts
+        // 4. Initialize counts
         const counts = {
             water: 0, road: 0, electric: 0, waste: 0, 
             health: 0, encroachment: 0, parks: 0, tax: 0, admin: 0
         };
 
-        // 4. Map MongoDB stats to our variables (Using .includes() makes it safer if names vary slightly)
-        if (stats && stats.deptCounts) {
-            stats.deptCounts.forEach(dept => {
-                const deptName = (dept._id || "").toLowerCase();
-                
-                if (deptName.includes("water") || deptName.includes("drainage")) counts.water += dept.count;
-                else if (deptName.includes("road") || deptName.includes("pwd") || deptName.includes("public works")) counts.road += dept.count;
-                else if (deptName.includes("electric")) counts.electric += dept.count;
-                else if (deptName.includes("waste") || deptName.includes("solid")) counts.waste += dept.count;
-                else if (deptName.includes("health")) counts.health += dept.count;
-                else if (deptName.includes("encroach")) counts.encroachment += dept.count;
-                else if (deptName.includes("park") || deptName.includes("garden")) counts.parks += dept.count;
-                else if (deptName.includes("tax") || deptName.includes("property")) counts.tax += dept.count;
-                else counts.admin += dept.count;
-            });
-        }
+        // 5. Calculate stats client-side from the master list
+        allGrievances.forEach(ticket => {
+            const deptName = (ticket.department || "").toLowerCase();
+            
+            if (deptName.includes("water") || deptName.includes("drainage")) counts.water++;
+            else if (deptName.includes("road") || deptName.includes("pwd") || deptName.includes("public works")) counts.road++;
+            else if (deptName.includes("electric") || deptName.includes("light") || deptName.includes("power")) counts.electric++;
+            else if (deptName.includes("waste") || deptName.includes("solid")) counts.waste++;
+            else if (deptName.includes("health") || deptName.includes("animal") || deptName.includes("dog")) counts.health++;
+            else if (deptName.includes("encroach") || deptName.includes("illegal")) counts.encroachment++;
+            else if (deptName.includes("park") || deptName.includes("garden") || deptName.includes("tree")) counts.parks++;
+            else if (deptName.includes("tax") || deptName.includes("property")) counts.tax++;
+            else counts.admin++;
+        });
 
-        // 5. Array mapping UI IDs to the count variables
+        // 6. Array mapping UI IDs to the count variables
         const deptMap = [
             { id: "water", count: counts.water },
             { id: "road", count: counts.road },
@@ -64,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             { id: "admin", count: counts.admin }
         ];
 
-        // 6. Loop through and update UI
+        // 7. Loop through and update UI
         deptMap.forEach(d => {
             const ticketEl = document.getElementById(`${d.id}Tickets`);
             const badgeEl = document.getElementById(`${d.id}Badge`);

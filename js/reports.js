@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-        // 2. Fetch Stats and Grievances
+        // FIXED: Added /all to the grievances fetch route to match backend
         let [statsRes, grievancesRes] = await Promise.all([
             fetch('https://pcmc-admin.onrender.com/api/stats', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/stats')),
-            fetch('https://pcmc-admin.onrender.com/api/grievances', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/grievances', { headers: { 'Authorization': `Bearer ${token}` } }))
+            fetch('https://pcmc-admin.onrender.com/api/grievances/all', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/grievances/all', { headers: { 'Authorization': `Bearer ${token}` } }))
         ]);
 
         if (!statsRes.ok || !grievancesRes.ok) throw new Error("Failed to load data");

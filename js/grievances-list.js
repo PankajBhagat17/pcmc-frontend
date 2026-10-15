@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             row.innerHTML = `
                 <td class="px-6 py-4 font-bold text-slate-900">${formattedId}</td>
                 <td class="px-6 py-4">
-                    <p class="font-bold text-slate-700">${ticket.department}</p>
+                    <p class="font-bold text-slate-700">${ticket.department || 'Unassigned'}</p>
                     <p class="text-xs text-slate-500 mt-1 truncate max-w-xs" title="${ticket.rawText}">${shortDesc}</p>
                 </td>
                 <td class="px-6 py-4">
@@ -63,15 +63,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 3. Fetch live data
     try {
-        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
+        // FIXED: Added /all to match backend routes
+        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-
-        if (response.status === 404) {
-            response = await fetch('https://pcmc-admin.onrender.com/grievances', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-        }
 
         if (!response.ok) throw new Error("Failed to fetch live data");
 
@@ -92,8 +87,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const filtered = allGrievances.filter(t => {
             const matchesSearch = t._id.toLowerCase().includes(searchTerm) || 
-                                  t.department.toLowerCase().includes(searchTerm) ||
-                                  t.rawText.toLowerCase().includes(searchTerm);
+                                  (t.department && t.department.toLowerCase().includes(searchTerm)) ||
+                                  (t.rawText && t.rawText.toLowerCase().includes(searchTerm));
             
             const matchesStatus = statusValue === "All" || 
                                   (statusValue === "Pending" && (t.status === "New" || t.status === "In-Progress")) || 
