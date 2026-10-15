@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <td class="px-6 py-4 font-bold text-slate-900">${formattedId}</td>
                 <td class="px-6 py-4 text-slate-500">${formatDate(ticket.createdAt)}</td>
                 <td class="px-6 py-4 text-slate-500 truncate max-w-xs" title="${displayLocation}">${displayLocation}</td>
-                <td class="px-6 py-4 font-medium text-slate-700">${ticket.department}</td>
+                <td class="px-6 py-4 font-medium text-slate-700">${ticket.department || 'Unassigned'}</td>
                 <td class="px-6 py-4">
                     <span class="px-2 py-1 text-xs font-bold rounded border ${urgencyColor}">${ticket.urgency}</span>
                 </td>
@@ -78,15 +78,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
+        // FIXED: Added /all to match your backend routes
+        let response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-
-        if (response.status === 404) {
-            response = await fetch('https://pcmc-admin.onrender.com/grievances', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-        }
         
         if (!response.ok) {
             if (response.status === 401 || response.status === 403) {
@@ -116,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const term = e.target.value.toLowerCase();
             const filtered = allGrievances.filter(t => 
                 t._id.toLowerCase().includes(term) || 
-                t.department.toLowerCase().includes(term) ||
+                (t.department && t.department.toLowerCase().includes(term)) ||
                 (t.location && t.location.toLowerCase().includes(term))
             );
             renderTable(filtered);
