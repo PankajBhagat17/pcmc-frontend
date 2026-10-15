@@ -53,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
         trackSubmitBtn.disabled = true;
 
         try {
-            // Fetch all grievances using the dynamic BASE_URL from api.js
-            const response = await fetch(`${BASE_URL}/grievances`);
+            // FIXED: Added /all to match your backend routes
+            const response = await fetch(`${BASE_URL}/grievances/all`);
 
             if (!response.ok) throw new Error("Database connection failed.");
 
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnUnsatisfied.disabled = true;
 
         try {
-            // Reopen ticket API call using BASE_URL and auth headers if available
+            // Reopen ticket API call
             const updateUrl = `${BASE_URL}/grievances/${currentTicketId}/status`;
             const res = await fetch(updateUrl, {
                 method: 'PUT',
