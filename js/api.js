@@ -61,8 +61,8 @@ async function registerUser(userData) {
 // ==========================================
 async function submitGrievance(grievanceData) {
     try {
-        // Fixed: matches backend route POST /api/grievances
-        const response = await fetch(`${BASE_URL}/grievances`, {
+        // FIXED: Added /submit to match the backend router
+        const response = await fetch(`${BASE_URL}/grievances/submit`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(grievanceData)
@@ -79,8 +79,8 @@ async function submitGrievance(grievanceData) {
 
 async function getAllGrievances() {
     try {
-        // Fixed: matches backend route GET /api/grievances
-        const response = await fetch(`${BASE_URL}/grievances`, {
+        // FIXED: Added /all to match the backend router
+        const response = await fetch(`${BASE_URL}/grievances/all`, {
             method: 'GET',
             headers: getAuthHeaders() // Added auth headers for admin fetching
         });
@@ -112,7 +112,6 @@ async function trackGrievance(ticketId) {
 
 async function updateTicketStatus(ticketId, status) {
     try {
-        // Fixed: matches backend route PUT /api/grievances/:id/status
         const response = await fetch(`${BASE_URL}/grievances/${ticketId}/status`, {
             method: 'PUT',
             headers: getAuthHeaders(),
