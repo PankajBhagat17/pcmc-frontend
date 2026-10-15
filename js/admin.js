@@ -32,7 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Function to handle inline status updates from officers
     window.updateStatus = async function(ticketId, newStatus) {
         try {
-            const response = await fetch(`https://pcmc-admin.onrender.com/api/grievances/${ticketId}`, {
+            // FIXED: Added /status to match your grievance.routes.js path
+            const response = await fetch(`https://pcmc-admin.onrender.com/api/grievances/${ticketId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
