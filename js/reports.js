@@ -1,57 +1,48 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Authenticate Officer
     const token = localStorage.getItem("pcmc_token");
     if (!token) {
         alert("Session expired. Please log in.");
-        window.location.href = "login.html";
-        return;
+        return window.location.href = "login.html";
     }
 
     let allGrievances = [];
 
-    // Helper: Convert array of objects to CSV string
     const convertToCSV = (data) => {
         const headers = ["Ticket ID", "Date Submitted", "Department", "Urgency", "Status", "Location", "Description"];
         const rows = data.map(ticket => {
             const formattedId = "PCMC-" + ticket._id.substring(0, 8).toUpperCase();
             const dateStr = new Date(ticket.createdAt).toLocaleDateString('en-IN');
-            
-            // Escape quotes to handle commas inside text fields safely
             const cleanLocation = (ticket.location || "Not Provided").replace(/"/g, '""');
             const cleanDesc = (ticket.rawText || "").replace(/"/g, '""');
             
             return [
-                formattedId,
-                dateStr,
-                ticket.department || "Unassigned",
-                ticket.urgency || "Normal",
-                ticket.status || "New",
-                `"${cleanLocation}"`,
-                `"${cleanDesc}"`
+                formattedId, dateStr, ticket.department || "Unassigned", ticket.urgency || "Normal",
+                ticket.status || "New", `"${cleanLocation}"`, `"${cleanDesc}"`
             ].join(",");
         });
-        
         return [headers.join(","), ...rows].join("\n");
     };
 
     try {
-        // FIXED: Added /all to the grievances fetch route to match backend
-        let [statsRes, grievancesRes] = await Promise.all([
-            fetch('https://pcmc-admin.onrender.com/api/stats', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/stats')),
-            fetch('https://pcmc-admin.onrender.com/api/grievances/all', { headers: { 'Authorization': `Bearer ${token}` } }).catch(() => fetch('https://pcmc-admin.onrender.com/grievances/all', { headers: { 'Authorization': `Bearer ${token}` } }))
-        ]);
+        // Fetch ONLY from the reliable master list, bypassing the broken stats route
+        const response = await fetch('https://pcmc-admin.onrender.com/api/grievances/all', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-        if (!statsRes.ok || !grievancesRes.ok) throw new Error("Failed to load data");
+        if (!response.ok) throw new Error("Failed to load data");
+        allGrievances = await response.json();
 
-        const stats = await statsRes.json();
-        allGrievances = await grievancesRes.json();
+        // 1. Calculate Departmental Load Manually for the Doughnut Chart
+        const deptCountsMap = {};
+        allGrievances.forEach(ticket => {
+            const dept = ticket.department || 'Unassigned';
+            deptCountsMap[dept] = (deptCountsMap[dept] || 0) + 1;
+        });
 
-        // 3. Render Live Departmental Load (Doughnut Chart)
-        if (stats.deptCounts && document.getElementById('categoryChart')) {
-            const sortedDepts = stats.deptCounts.sort((a, b) => b.count - a.count);
-            const deptLabels = sortedDepts.map(d => d._id || 'Unassigned');
-            const deptData = sortedDepts.map(d => d.count);
+        const deptLabels = Object.keys(deptCountsMap);
+        const deptData = Object.values(deptCountsMap);
 
+        if (document.getElementById('categoryChart') && deptLabels.length > 0) {
             const categoryCtx = document.getElementById('categoryChart').getContext('2d');
             new Chart(categoryCtx, {
                 type: 'doughnut',
@@ -63,15 +54,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                         borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        // 4. Render Submission Trend (Line Chart)
+        // 2. Render Submission Trend (Line Chart)
         if (document.getElementById('trendChart') && allGrievances.length > 0) {
             const last7Days = [...Array(7)].map((_, i) => {
                 const d = new Date();
@@ -117,24 +104,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Dashboard Load Error:", error);
     }
 
-    // 5. Handle CSV Export
+    // CSV Export Logic
     const exportCsvBtn = document.getElementById("exportCsvBtn");
     if (exportCsvBtn) {
         exportCsvBtn.addEventListener("click", () => {
-            if (allGrievances.length === 0) {
-                alert("No data available to export.");
-                return;
-            }
-
+            if (allGrievances.length === 0) return alert("No data available to export.");
             const csvString = convertToCSV(allGrievances);
             const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
-            
             const link = document.createElement("a");
             link.setAttribute("href", url);
             link.setAttribute("download", `PCMC_Official_Report_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
-            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
