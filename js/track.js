@@ -24,16 +24,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const feedbackContent = document.getElementById("feedbackContent");
 
     let currentTicketId = null;
+    const API_BASE_URL = "https://pcmc-admin.onrender.com/api";
 
     // Helper: Reset Timeline styling
     const resetTimeline = () => {
-        stepInProgress.classList.add("opacity-40");
-        stepInProgress.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        if (stepInProgress) {
+            stepInProgress.classList.add("opacity-40");
+            stepInProgress.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        }
         
-        stepResolved.classList.add("opacity-40");
-        stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        if (stepResolved) {
+            stepResolved.classList.add("opacity-40");
+            stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        }
         
-        feedbackBox.classList.add("hidden");
+        if (feedbackBox) feedbackBox.classList.add("hidden");
     };
 
     trackForm.addEventListener("submit", async (e) => {
@@ -53,8 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         trackSubmitBtn.disabled = true;
 
         try {
-            // FIXED: Added /all to match your backend routes
-            const response = await fetch(`${BASE_URL}/grievances/all`);
+            const response = await fetch(`${API_BASE_URL}/grievances`);
 
             if (!response.ok) throw new Error("Database connection failed.");
 
@@ -84,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             displayDate.innerText = d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
             // Urgency Badge Styling
-            displayUrgency.innerText = ticket.urgency + " Urgency";
+            displayUrgency.innerText = (ticket.urgency || "Low") + " Urgency";
             if (ticket.urgency === 'High' || ticket.urgency === 'Critical') {
                 displayUrgency.className = "px-3 py-1 rounded-md text-sm font-medium border text-red-700 bg-red-50 border-red-200";
             } else {
@@ -119,47 +123,51 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 3. Handle Citizen Feedback (Resolved Tickets)
-    btnSatisfied.addEventListener("click", () => {
-        feedbackContent.innerHTML = `
-            <h3 class="text-lg font-bold mb-2">Thank you!</h3>
-            <p class="text-sm text-blue-200">Your confirmation helps us maintain high standards for Pimpri-Chinchwad.</p>
-        `;
-    });
-
-    btnUnsatisfied.addEventListener("click", async () => {
-        if (!currentTicketId) return;
-        
-        btnUnsatisfied.innerText = "Escalating...";
-        btnUnsatisfied.disabled = true;
-
-        try {
-            // Reopen ticket API call
-            const updateUrl = `${BASE_URL}/grievances/${currentTicketId}/status`;
-            const res = await fetch(updateUrl, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('pcmc_token') || ''}`
-                },
-                body: JSON.stringify({ status: 'Reopened' })
-            });
-
-            if (!res.ok) throw new Error("Failed to escalate");
-
+    if (btnSatisfied) {
+        btnSatisfied.addEventListener("click", () => {
             feedbackContent.innerHTML = `
-                <h3 class="text-lg font-bold text-red-400 mb-2">Ticket Reopened & Escalated</h3>
-                <p class="text-sm text-blue-200">We apologize for the inconvenience. This issue has been pushed back to the Zonal Head for immediate review.</p>
+                <h3 class="text-lg font-bold mb-2">Thank you!</h3>
+                <p class="text-sm text-blue-200">Your confirmation helps us maintain high standards for Pimpri-Chinchwad.</p>
             `;
-            
-            // Adjust timeline visually to reflect reopened state
-            stepResolved.classList.add("opacity-40");
-            stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+        });
+    }
 
-        } catch (error) {
-            console.error(error);
-            alert("Error escalating ticket. Please try again later.");
-            btnUnsatisfied.innerText = "No, reopen & escalate ticket";
-            btnUnsatisfied.disabled = false;
-        }
-    });
+    if (btnUnsatisfied) {
+        btnUnsatisfied.addEventListener("click", async () => {
+            if (!currentTicketId) return;
+            
+            btnUnsatisfied.innerText = "Escalating...";
+            btnUnsatisfied.disabled = true;
+
+            try {
+                // Reopen ticket API call
+                const updateUrl = `${API_BASE_URL}/grievances/${currentTicketId}/status`;
+                const res = await fetch(updateUrl, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('pcmc_token') || ''}`
+                    },
+                    body: JSON.stringify({ status: 'Reopened' })
+                });
+
+                if (!res.ok) throw new Error("Failed to escalate");
+
+                feedbackContent.innerHTML = `
+                    <h3 class="text-lg font-bold text-red-400 mb-2">Ticket Reopened & Escalated</h3>
+                    <p class="text-sm text-blue-200">We apologize for the inconvenience. This issue has been pushed back to the Zonal Head for immediate review.</p>
+                `;
+                
+                // Adjust timeline visually to reflect reopened state
+                stepResolved.classList.add("opacity-40");
+                stepResolved.querySelector("div").classList.replace("bg-blue-950", "bg-gray-300");
+
+            } catch (error) {
+                console.error(error);
+                alert("Error escalating ticket. Please try again later.");
+                btnUnsatisfied.innerText = "No, reopen & escalate ticket";
+                btnUnsatisfied.disabled = false;
+            }
+        });
+    }
 });
