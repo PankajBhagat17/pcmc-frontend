@@ -24,9 +24,43 @@ document.addEventListener("DOMContentLoaded", async () => {
         const statUrgent = document.getElementById('statUrgent');
 
         if (statTotal) statTotal.innerText = data.length;
-        if (statPending) statPending.innerText = data.filter(g => g.status === 'New' || g.status === 'In-Progress' || g.status === 'Reopened').length;
+        if (statPending) statPending.innerText = data.filter(g => g.status === 'New' || g.status === 'Pending' || g.status === 'In-Progress' || g.status === 'Reopened').length;
         if (statResolved) statResolved.innerText = data.filter(g => g.status === 'Resolved').length;
         if (statUrgent) statUrgent.innerText = data.filter(g => g.urgency === 'High' || g.urgency === 'Critical').length;
+    };
+
+    // Function to handle inline status updates from officers
+    window.updateStatus = async function(ticketId, newStatus) {
+        try {
+            const response = await fetch(`https://pcmc-admin.onrender.com/api/grievances/${ticketId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) throw new Error("Failed to update status on server.");
+
+            // Refresh data list after successful update
+            const res = await fetch('https://pcmc-admin.onrender.com/api/grievances', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            allGrievances = await res.json();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const deptFilter = urlParams.get('dept');
+            let displayData = allGrievances;
+            if (deptFilter) {
+                displayData = allGrievances.filter(t => (t.department || "").toLowerCase().includes(deptFilter.toLowerCase()));
+            }
+
+            updateStats(allGrievances);
+            renderTable(displayData);
+        } catch (error) {
+            alert("Error updating status: " + error.message);
+        }
     };
 
     const renderTable = (data) => {
@@ -40,9 +74,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         data.forEach(ticket => {
             const urgencyColor = (ticket.urgency === 'High' || ticket.urgency === 'Critical') ? 'text-red-600 bg-red-50 border-red-100' : 'text-blue-600 bg-blue-50 border-blue-100';
+            
+            // Format status styling & display names cleanly
             let statusColor = 'text-slate-600 bg-slate-100 border-slate-200';
-            if (ticket.status === 'Resolved') statusColor = 'text-green-600 bg-green-50 border-green-200';
-            if (ticket.status === 'In-Progress') statusColor = 'text-orange-600 bg-orange-50 border-orange-200';
+            let displayStatus = ticket.status || 'Pending';
+            if (displayStatus === 'Resolved') statusColor = 'text-green-600 bg-green-50 border-green-200';
+            if (displayStatus === 'In-Progress') statusColor = 'text-orange-600 bg-orange-50 border-orange-200';
+            if (displayStatus === 'New') displayStatus = 'Pending';
 
             const displayLocation = ticket.location || 'Location not provided';
             const formattedId = "PCMC-" + ticket._id.substring(0, 8).toUpperCase();
@@ -58,10 +96,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <span class="px-2 py-1 text-xs font-bold rounded border ${urgencyColor}">${ticket.urgency}</span>
                 </td>
                 <td class="px-6 py-4">
-                    <span class="px-2 py-1 text-xs font-bold rounded border ${statusColor}">${ticket.status}</span>
+                    <span class="px-2 py-1 text-xs font-bold rounded border ${statusColor}">${displayStatus}</span>
                 </td>
-                <td class="px-6 py-4">
-                    <a href="ticket-detail.html?id=${ticket._id}" class="text-blue-600 font-semibold hover:underline">View →</a>
+                <td class="px-6 py-4 flex items-center gap-2">
+                    <select onchange="window.updateStatus('${ticket._id}', this.value)" class="text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium text-slate-700 focus:outline-none focus:border-blue-600">
+                        <option value="" disabled selected>Update Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In-Progress">In-Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                    <a href="ticket-detail.html?id=${ticket._id}" class="text-blue-600 text-xs font-semibold hover:underline">View</a>
                 </td>
             `;
             tableBody.appendChild(row);
