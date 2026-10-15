@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 // PROPER TICKET ID FORMATTING 
-                const cleanId = response.grievance._id.substring(0, 8).toUpperCase();
-                alert(`Grievance Submitted Successfully! Ticket ID: PCMC-${cleanId}`);
+const ticketData = response.grievance || response;
+const cleanId = ticketData._id ? ticketData._id.substring(0, 8).toUpperCase() : "SUCCESS";                alert(`Grievance Submitted Successfully! Ticket ID: PCMC-${cleanId}`);
 
                 grievanceForm.reset();
                 aiBox.classList.add("hidden");
