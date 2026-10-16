@@ -1,23 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const textarea = document.getElementById("complaintInput");
     const locationInput = document.getElementById("locationInput");
-    const aiBox = document.getElementById("aiBox");
     const grievanceForm = document.getElementById("grievanceForm");
 
-    if (textarea && aiBox && grievanceForm) {
+    if (textarea && grievanceForm) {
         
-        textarea.addEventListener("input", function () {
-            if (this.value.length > 20) {
-                if (aiBox.classList.contains("hidden")) {
-                    aiBox.classList.remove("hidden");
-                    aiBox.classList.add("flex", "fade-in");
-                }
-            } else {
-                aiBox.classList.add("hidden");
-                aiBox.classList.remove("flex", "fade-in");
-            }
-        });
-
         grievanceForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -75,8 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(`Grievance Submitted Successfully!\n\nYour Tracking Ticket ID is: PCMC-${cleanId}\n\nPlease save this ID to track your status.`);
 
                 grievanceForm.reset();
-                aiBox.classList.add("hidden");
-                aiBox.classList.remove("flex", "fade-in");
 
             } catch (error) {
                 alert("Error: " + error.message);

@@ -6,24 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PCMC Grievance Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Smooth transitions for the AI feedback box */
-    .fade-in {
-      animation: fadeIn 0.4s ease-in-out forwards;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-5px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
 </head>
 
 <body class="bg-white text-gray-800 font-sans antialiased min-h-screen flex flex-col">
@@ -108,30 +90,6 @@
                   </path>
                 </svg>
               </button>
-            </div>
-          </div>
-
-          <!-- AI Processing Box (Hidden initially) -->
-          <div id="aiBox"
-            class="hidden flex-col md:flex-row gap-4 items-center bg-[#f8fafc] border border-blue-100 rounded-xl p-4 mb-6">
-            <div class="flex items-center gap-2 bg-blue-50 text-blue-800 px-3 py-1.5 rounded-md text-sm font-medium">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                </path>
-              </svg>
-              Detected Category: <span class="font-bold">Roads</span>
-            </div>
-            <div class="flex items-center gap-2 bg-red-50 text-red-700 px-3 py-1.5 rounded-md text-sm font-medium">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                </path>
-              </svg>
-              Urgency: <span class="font-bold">High</span>
-            </div>
-            <div class="text-xs text-gray-500 italic flex-1 text-right">
-              Rationale: Mention of 'pothole' and 'main road'
             </div>
           </div>
 
