@@ -59,15 +59,20 @@ document.addEventListener("DOMContentLoaded", () => {
             btnLoader.classList.remove("hidden");
 
             try {
+                // Ensure submitGrievance returns the parsed JSON from the backend
                 const response = await submitGrievance({
                     rawText: textValue,
                     userId: currentUserId,
                     location: locationValue
                 });
 
-                // PROPER TICKET ID FORMATTING 
-const ticketData = response.grievance || response;
-const cleanId = ticketData._id ? ticketData._id.substring(0, 8).toUpperCase() : "SUCCESS";                alert(`Grievance Submitted Successfully! Ticket ID: PCMC-${cleanId}`);
+                // FIXED: Look for response.ticket since backend returns res.json({ ticket: newGrievance })
+                const ticketData = response.ticket || response.grievance || response;
+                
+                const cleanId = ticketData._id ? ticketData._id.substring(0, 8).toUpperCase() : "SUCCESS";                
+                
+                // Formatted multi-line alert for the citizen
+                alert(`Grievance Submitted Successfully!\n\nYour Tracking Ticket ID is: PCMC-${cleanId}\n\nPlease save this ID to track your status.`);
 
                 grievanceForm.reset();
                 aiBox.classList.add("hidden");
